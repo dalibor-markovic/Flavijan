@@ -1,0 +1,107 @@
+﻿@{
+    ViewBag.Title = "Zaposleni";
+}
+
+<script src="/Scripts/jquery-3.4.1.js"></script>
+
+<div class="row">
+
+    <div class="col-sm-2">
+        <br />
+        <label for="input_ime">Ime:</label>
+        <input type="text" id="input_ime" />
+        <label for="input_prezime">Prezime:</label>
+        <input type="text" id="input_prezime" />
+        <label for="input_adresa">Adresa:</label>
+        <input type="text" id="input_adresa" />
+        <label for="input_neto_plata">Neto plata:</label>
+        <input type="text" id="input_neto_plata" /><br /><br />
+        <input type="button" id="input_sacuvaj" value="Unesi" /><br /><br />
+        <p id="txt"></p>
+    </div>
+</div>
+
+<script>
+
+    /*
+        $.ajax({
+            type: "POST",       //GET or POST or PUT or DELETE verb
+            url: "/api/account/updateuser/",       // Location of the service
+            data: { Email: user, Roles: Roles },
+            contentType: "application/json",
+            dataType: "json",
+            success: function (result) {//On Successful service call
+            console.log(result);
+            }
+        });
+    */
+
+    // function... onclick
+
+            //var myObjectFilter = {
+            //    "lastName": $("#txtLastName").val()
+            //};
+
+    // console.log(myObjectFilter);
+
+    $(function () {
+
+        $("#input_sacuvaj").click(function () {
+
+            var radnik = {
+                ime: $("#input_ime").val(),
+                prezime: $("#input_prezime").val(),
+                adresa: $("#input_adresa").val(),
+                netoPlata: parseFloat($("#input_neto_plata").val())
+            };
+
+            var radnikJSON = JSON.stringify(radnik);
+
+
+            $.ajax({
+                    type: "POST",
+                    contentType: "application/json",
+                    dataType: "json",
+                    data: radnikJSON,
+                    url: "/home/saveObj",
+                    success: function(ret){
+                            console.log("Vraceno: " + ret.ime + " " + ret.prezime + " " + ret.adresa + " " + ret.netoPlata);
+                    },
+                    error: function(e){
+                        console.log('Greska: '+e);
+                    }
+            });
+
+
+
+//            alert(radnikJSON);
+/*
+            $.ajax({
+                url: '/home/saveObj/',
+                type: 'POST',
+                dataType: 'text',//"json",
+                contentType: 'text',//json/application",
+                data: "proba",
+                    {ime: radnik.ime,
+                    'prezime': radnik.prezime,
+                    'adresa': radnik.adresa,
+                    'netoPlata': radnik.netoPlata}
+                error: function (e) {
+                    //alert("Greska!");
+                    console.log("Greska: ", e);
+                },
+                success: function (ret) {
+                    console.log("Vraceno: " + ret);
+//                    alert("Vraceno: " + ret.ime + " " + ret.prezime + " " + ret.adresa + " " + ret.netoPlata);
+
+                }
+            });
+*/
+            
+        });
+
+    });
+    
+    
+
+</script>
