@@ -1,0 +1,209 @@
+﻿
+@{
+    ViewBag.Title = "Tabela";
+}
+
+
+
+<script src="/Scripts/jquery-3.4.1.js"></script>
+
+            <script>
+
+                $(function () {
+
+                    var radnik = {
+                        ID: 0,
+                        ime: "Ime",
+                        prezime: "Prezime",
+                        adresa: "Adresa",
+                        netoPlata: 0,
+                        brutoPlata: 0
+                    };
+
+                    var radnikJSON = JSON.stringify(radnik);
+
+                        $.ajax({
+                            type: "POST",
+                            contentType: "application/json",
+                            dataType: "json",
+                            data: radnikJSON,
+                            url: "/home/Vrati",
+                            success: function (ret) {
+                                document.writeln("<style>#zaposleni th, #zaposleni td {padding: 8px; border: 1px solid #ddd; text-align: left;}" +
+                                    "#zaposleni {border-collapse: collapse; width: 100%;}</style>");
+                                document.writeln("<table id=\"zaposleni\"><thead><tr><th>ID</th>");
+                                document.writeln("<th>Ime</th>");
+                                document.writeln("<th>Prezime</th>");
+                                document.writeln("<th>Adresa</th>");
+                                document.writeln("<th>Neto plata</th>");
+                                document.writeln("<th>Bruto plata</th></tr>");
+                                document.writeln("</tr></thead><tbody>");
+                                for (i = 0; i < ret.length; i++) {
+                                    document.writeln("<tr>");
+                                    document.writeln("<td>" + ret[i].ID + "</td>");
+                                    document.writeln("<td>" + ret[i].ime + "</td>");
+                                    document.writeln("<td>" + ret[i].prezime + "</td>");
+                                    document.writeln("<td>" + ret[i].adresa + "</td>");
+                                    document.writeln("<td>" + ret[i].netoPlata + "</td>");
+                                    document.writeln("<td>" + ret[i].brutoPlata + "</td>");
+                                    document.writeln('<td><input type="button" value="Izmeni" id="i' + ret[i].ID + '" />' +
+                                        '<input type="button" value="Potvrdi" style="visibility:hidden" id="p' + ret[i].ID + '" />' +
+                                        '<input type="button" value="Otkazi" style="visibility:hidden" id="ot' + ret[i].ID + '" /></td >');
+                                    document.writeln('<td><input type="button" value="Obrisi" id="ob' + ret[i].ID + '" /></td></tr>');
+                                }
+                                document.writeln("</tbody></table>");
+                                document.writeln('<br /><input type="button" id="nazad" value="Vrati se nazad" />');
+                                $("#nazad").click(function () {
+                                    window.location.href = "/home/Index";
+                                });
+
+                                $('input[id^="i"]').click(function () {
+
+                                    var ulaz = this.id;
+                                    radnik.ID = (ulaz.match(/\d+/))[0];
+
+                                    $(':button').prop('disabled', true);
+                                                                                                           
+                                    var drugoDugme = document.getElementById(ulaz).nextElementSibling;
+                                    att = document.createAttribute("style");
+                                    att.value = "visibility:visible";
+                                    drugoDugme.setAttributeNode(att);
+
+                                    $('#p' + radnik.ID).prop('disabled', false);
+
+                                    var treceDugme = document.getElementById(ulaz).nextElementSibling.nextElementSibling;
+                                    att = document.createAttribute("style");
+                                    att.value = "visibility:visible";
+                                    treceDugme.setAttributeNode(att);
+
+                                    $('#ot' + radnik.ID).prop('disabled', false);
+
+                                    var redTabele = document.getElementById(ulaz).parentElement.parentElement;
+
+                                    celije = redTabele.getElementsByTagName("td");
+
+                                    radnik.ime = $(celije[1]).text();
+                                    radnik.prezime = $(celije[2]).text();
+                                    radnik.adresa = $(celije[3]).text();
+                                    radnik.netoPlata = $(celije[4]).text();
+                                    radnik.brutoPlata = $(celije[5]).text();
+
+                                    for (i = 1; i < 6; i++) {
+
+                                                att = document.createAttribute("contenteditable");
+                                                att.value = "true";
+                                                celije[i].setAttributeNode(att);
+                                                att = document.createAttribute("style");
+                                                att.value = "background-color: lightgray";
+                                                celije[i].setAttributeNode(att);
+                                    }
+
+                                    celije[1].focus();
+
+                                    $(celije[4]).on("blur", function () {
+                                        var temp = parseFloat($(celije[4]).text());
+                                        temp = (temp + (temp * 36.55 / 100));
+                                        $(celije[5]).text(temp);
+                                    });
+
+                                    $(celije[5]).on("blur", function () {
+                                        var temp = parseFloat($(celije[5]).text());
+                                        temp = (temp * 100 / 136.55);
+                                        $(celije[4]).text(temp);
+                                    });
+
+
+                                    $('#ot' + radnik.ID).click(function () {
+                                                for (i = 1; i < 6; i++) {
+                                                    att = document.createAttribute("contenteditable");
+                                                    att.value = "false";
+                                                    celije[i].setAttributeNode(att);
+                                                    att = document.createAttribute("style");
+                                                    att.value = "background-color: white";
+                                                    celije[i].setAttributeNode(att);
+                                                }
+
+                                        $(':button').prop('disabled', false);
+
+                                        this.style = "visibility:hidden";
+                                        this.previousElementSibling.style = "visibility:hidden";
+
+                                        $(celije[1]).text(radnik.ime);
+                                        $(celije[2]).text(radnik.prezime);
+                                        $(celije[3]).text(radnik.adresa);
+                                        $(celije[4]).text(radnik.netoPlata);
+                                        $(celije[5]).text(radnik.brutoPlata);
+                                    });
+
+                                    $('#p' + radnik.ID).click(function () {
+                                        radnik.ID = parseInt($(celije[0]).text());
+                                        radnik.ime = $(celije[1]).text();
+                                        radnik.prezime = $(celije[2]).text();
+                                        radnik.adresa = $(celije[3]).text();
+                                        radnik.netoPlata = parseFloat($(celije[4]).text());
+                                        radnik.brutoPlata = parseFloat($(celije[5]).text());
+
+                                        var radnikJSON = JSON.stringify(radnik);
+
+                                        for (i = 1; i < 6; i++) {
+                                            att = document.createAttribute("contenteditable");
+                                            att.value = "false";
+                                            celije[i].setAttributeNode(att);
+                                            att = document.createAttribute("style");
+                                            att.value = "background-color: white";
+                                            celije[i].setAttributeNode(att);
+                                        }
+
+                                        $(':button').prop('disabled', false);
+
+                                        this.style = "visibility:hidden";
+                                        this.nextElementSibling.style = "visibility:hidden";
+
+                                        $.ajax({
+                                            type: "POST",
+                                            contentType: "application/json",
+                                            dataType: "json",
+                                            data: radnikJSON,
+                                            url: "/home/Izmeni",
+                                            success: function (ret) {
+                                                console.log(ret);
+                                            },
+                                            error: function (e) {
+                                                console.log("Greska: " + e);
+                                            }
+                                        });
+                                    });
+                                });
+
+                                $('input[id^="ob"]').click(function () {
+
+                                    var ulaz = this.id;
+                                    radnik.ID = (ulaz.match(/\d+/))[0];
+
+                                    document.getElementById(ulaz).parentElement.parentElement.remove();
+
+                                    var radnikJSON = JSON.stringify(radnik);
+
+                                        $.ajax({
+                                            type: "POST",
+                                            contentType: "application/json",
+                                            dataType: "json",
+                                            data: radnikJSON,
+                                            url: "/home/Obrisi",
+                                            success: function (ret) {
+                                                console.log(ret);
+                                            },
+                                            error: function (e) {
+                                                console.log("Greska: " + e);
+                                            }
+                                        });
+                                });
+                            },
+                            error: function (e) {
+                                console.log("Greska: " + e);
+                            }
+                        });
+ 
+                });
+
+            </script>

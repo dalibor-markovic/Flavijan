@@ -17,32 +17,12 @@
         <label for="input_neto_plata">Neto plata:</label>
         <input type="text" id="input_neto_plata" /><br /><br />
         <input type="button" id="input_sacuvaj" value="Unesi" /><br /><br />
-        <p id="txt"></p>
+        <input type="button" id="input_prikazi" value="Prikazi tabelu" /><br /><br />
+        <p id="poruka"></p>
     </div>
 </div>
 
 <script>
-
-    /*
-        $.ajax({
-            type: "POST",       //GET or POST or PUT or DELETE verb
-            url: "/api/account/updateuser/",       // Location of the service
-            data: { Email: user, Roles: Roles },
-            contentType: "application/json",
-            dataType: "json",
-            success: function (result) {//On Successful service call
-            console.log(result);
-            }
-        });
-    */
-
-    // function... onclick
-
-            //var myObjectFilter = {
-            //    "lastName": $("#txtLastName").val()
-            //};
-
-    // console.log(myObjectFilter);
 
     $(function () {
 
@@ -57,51 +37,26 @@
 
             var radnikJSON = JSON.stringify(radnik);
 
-
             $.ajax({
                     type: "POST",
                     contentType: "application/json",
                     dataType: "json",
                     data: radnikJSON,
-                    url: "/home/saveObj",
-                    success: function(ret){
-                            console.log("Vraceno: " + ret.ime + " " + ret.prezime + " " + ret.adresa + " " + ret.netoPlata);
+                    url: "/home/Upisi",
+                success: function (ret) {
+                    $("#poruka").text("Radnik: " + ret.ime + " " + ret.prezime +
+                        " je upisan u bazu podataka! Neto plata iznosi: "+ret.brutoPlata);
                     },
-                    error: function(e){
-                        console.log('Greska: '+e);
+                error: function (e) {
+                    $("#poruka").text("Doslo je do greske! Molim Vas pokusajte ponovo.");
                     }
             });
-
-
-
-//            alert(radnikJSON);
-/*
-            $.ajax({
-                url: '/home/saveObj/',
-                type: 'POST',
-                dataType: 'text',//"json",
-                contentType: 'text',//json/application",
-                data: "proba",
-                    {ime: radnik.ime,
-                    'prezime': radnik.prezime,
-                    'adresa': radnik.adresa,
-                    'netoPlata': radnik.netoPlata}
-                error: function (e) {
-                    //alert("Greska!");
-                    console.log("Greska: ", e);
-                },
-                success: function (ret) {
-                    console.log("Vraceno: " + ret);
-//                    alert("Vraceno: " + ret.ime + " " + ret.prezime + " " + ret.adresa + " " + ret.netoPlata);
-
-                }
-            });
-*/
-            
         });
 
+        $("#input_prikazi").click(function () {
+
+            window.location.href = "/home/Tabela";
+        });
     });
     
-    
-
 </script>
