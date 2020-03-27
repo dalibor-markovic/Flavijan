@@ -12,8 +12,18 @@ using WebApplication3.Models;
 
 namespace WebApplication3.Controllers
 {
+    
     public class HomeController : Controller
     {
+        public ActionResult TabelaGotova()
+        {
+            return View();
+        }
+        public ActionResult Greska()
+        {
+            return View();
+        }
+
         public ActionResult Index()
         {
             return View();
@@ -43,26 +53,29 @@ namespace WebApplication3.Controllers
         [HttpPost]        
         public ContentResult Upisi(Radnik radnik)
         {
-            Radnik.connectionString = "Server=DESKTOP-4CRF79E;Database=Gemini;Trusted_Connection=True;ConnectRetryCount=3;";
+            Radnik.ConnectionString = "Server=DESKTOP-4CRF79E;Database=Gemini;Trusted_Connection=True;ConnectRetryCount=3;";
+            var radnikProvider = new RadnikProvider();
 
-            return Content(JsonConvert.SerializeObject(Radnik.UpisiNovogRadnika(radnik)));
+            return Content(JsonConvert.SerializeObject(radnikProvider.UpisiNovogRadnika(radnik)));
 
         }
 
         [HttpPost]
-        public ContentResult Vrati(Radnik radnik)
+        public ContentResult Vrati()
         {
-            Radnik.connectionString = "Server=DESKTOP-4CRF79E;Database=Gemini;Trusted_Connection=True;ConnectRetryCount=3;";
+            Radnik.ConnectionString = "Server=DESKTOP-4CRF79E;Database=Gemini;Trusted_Connection=True;ConnectRetryCount=3;";
 
-            return Content(JsonConvert.SerializeObject(Radnik.IzveziTabelu()));
+            var radnikProvider = new RadnikProvider();
+
+            return Content(JsonConvert.SerializeObject(radnikProvider.IzveziTabelu()));
         }
 
         [HttpPost]
         public ContentResult Obrisi(Radnik radnik)
         {
-            Radnik.connectionString = "Server=DESKTOP-4CRF79E;Database=Gemini;Trusted_Connection=True;ConnectRetryCount=3;";
-
-            Radnik.ObrisiRadnika(radnik.ID);
+            Radnik.ConnectionString = "Server=DESKTOP-4CRF79E;Database=Gemini;Trusted_Connection=True;ConnectRetryCount=3;";
+            var radnikProvider = new RadnikProvider();
+            radnikProvider.ObrisiRadnika(radnik);
 
             return Content(JsonConvert.SerializeObject(radnik));
         }
@@ -70,9 +83,9 @@ namespace WebApplication3.Controllers
         [HttpPost]
         public ContentResult Izmeni(Radnik radnik)
         {
-            Radnik.connectionString = "Server=DESKTOP-4CRF79E;Database=Gemini;Trusted_Connection=True;ConnectRetryCount=3;";
-
-            Radnik.PromeniRadnika(radnik);
+            Radnik.ConnectionString = "Server=DESKTOP-4CRF79E;Database=Gemini;Trusted_Connection=True;ConnectRetryCount=3;";
+            var radnikProvider = new RadnikProvider();
+            radnikProvider.PromeniRadnika(radnik);
 
             return Content(JsonConvert.SerializeObject(radnik));
         }

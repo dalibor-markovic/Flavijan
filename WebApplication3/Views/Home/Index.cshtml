@@ -5,16 +5,15 @@
 <script src="/Scripts/jquery-3.4.1.js"></script>
 
 <div class="row">
-
-    <div class="col-sm-2">
+    <div class="col-sm-4">
         <br />
-        <label for="input_ime">Ime:</label>
-        <input type="text" id="input_ime" />
-        <label for="input_prezime">Prezime:</label>
-        <input type="text" id="input_prezime" />
-        <label for="input_adresa">Adresa:</label>
-        <input type="text" id="input_adresa" />
-        <label for="input_neto_plata">Neto plata:</label>
+        <label for="input_ime">Ime:</label><br/>
+        <input type="text" id="input_ime" /><br />
+        <label for="input_prezime">Prezime:</label><br />
+        <input type="text" id="input_prezime" /><br />
+        <label for="input_adresa">Adresa:</label><br />
+        <input type="text" id="input_adresa" /><br />
+        <label for="input_neto_plata">Neto plata:</label><br />
         <input type="text" id="input_neto_plata" /><br /><br />
         <input type="button" id="input_sacuvaj" value="Unesi" /><br /><br />
         <input type="button" id="input_prikazi" value="Prikazi tabelu" /><br /><br />
@@ -29,34 +28,64 @@
         $("#input_sacuvaj").click(function () {
 
             var radnik = {
-                ime: $("#input_ime").val(),
-                prezime: $("#input_prezime").val(),
-                adresa: $("#input_adresa").val(),
-                netoPlata: parseFloat($("#input_neto_plata").val())
+                Ime: $("#input_ime").val(),
+                Prezime: $("#input_prezime").val(),
+                Adresa: $("#input_adresa").val(),
+                NetoPlata: parseFloat($("#input_neto_plata").val()),
+                greska: { ime: "Niste uneli validno ime!", prezime: "Niste uneli validno prezime!", 
+                    adresa: "Niste uneli validnu adresu!", netoPlata: "Niste uneli validnu neto platu!",
+                    brutoPlata: "Niste uneli validnu bruto platu!",
+                    zastave: { ime: false, prezime: false, adresa: false, netoPlata: false, brutoPlata: false }
+                }
             };
 
             var radnikJSON = JSON.stringify(radnik);
 
-            $.ajax({
-                    type: "POST",
-                    contentType: "application/json",
-                    dataType: "json",
-                    data: radnikJSON,
-                    url: "/home/Upisi",
-                success: function (ret) {
-                    $("#poruka").text("Radnik: " + ret.ime + " " + ret.prezime +
-                        " je upisan u bazu podataka! Neto plata iznosi: "+ret.brutoPlata);
-                    },
-                error: function (e) {
-                    $("#poruka").text("Doslo je do greske! Molim Vas pokusajte ponovo.");
-                    }
-            });
+            radnik.greska.zastave.ime = /[0-9!@@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(radnik.Ime);
+            radnik.greska.zastave.prezime = /[0-9!@@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(radnik.Prezime);
+            radnik.greska.zastave.adresa = /[!@@#$%^&*()_+\-=\[\]{};':"\\|,.<>\?]+/.test(radnik.Adresa);
+                if (radnik.Adresa.charAt(0) >= 0 && radnik.Adresa.charAt(0) <= 9) radnik.greska.zastave.adresa = true;
+            radnik.greska.zastave.netoPlata = (!isFinite(radnik.NetoPlata) || (radnik.NetoPlata < 0));
+
+            var poruka = "";
+
+            if (radnik.greska.zastave.ime) poruka += (radnik.greska.ime+"\n");
+            if (radnik.greska.zastave.prezime) poruka += (radnik.greska.prezime + "\n");
+            if (radnik.greska.zastave.adresa) poruka += (radnik.greska.adresa + "\n");
+            if (radnik.greska.zastave.netoPlata) poruka += (radnik.greska.netoPlata + "\n");
+
+            if (radnik.greska.zastave.ime | radnik.greska.zastave.prezime |
+                radnik.greska.zastave.adresa | radnik.greska.zastave.netoPlata) {
+
+                att = document.createAttribute("style");
+                att.value = "color: red";
+                document.getElementById("poruka").setAttributeNode(att);
+                $("#poruka").text(poruka);
+            } else {
+                att = document.createAttribute("style");
+                att.value = "color: black";
+                document.getElementById("poruka").setAttributeNode(att);
+                $("#poruka").text("");
+
+                $.ajax({
+                        type: "POST",
+                        contentType: "application/json",
+                        dataType: "json",
+                        data: radnikJSON,
+                        url: "/home/Upisi",
+                    success: function (ret) {
+                        $("#poruka").text("Radnik: " + ret.Ime + " " + ret.Prezime +
+                            " je upisan u bazu podataka! Bruto plata iznosi: "+ret.BrutoPlata);
+                        },
+                    error: function (e) {
+                        $("#poruka").text("Doslo je do greske! Molim Vas pokusajte ponovo.");
+                        }
+                });
+            }
+
         });
 
-        $("#input_prikazi").click(function () {
-
-            window.location.href = "/home/Tabela";
-        });
+        $("#input_prikazi").click(function () { window.location.href = "/home/Tabela"; });
     });
     
 </script>

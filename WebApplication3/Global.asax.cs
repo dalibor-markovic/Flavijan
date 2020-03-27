@@ -21,5 +21,23 @@ namespace WebApplication3
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
         }
+
+        protected void Application_Error(object sender, EventArgs e)
+        {
+            try
+            {
+                Exception exc = Server.GetLastError();
+
+                if (exc is HttpUnhandledException)
+                {
+                  
+                    Response.Redirect("~/home/Greska");
+                }
+            }
+            catch (Exception)
+            {
+                Response.Redirect("/home/Greska");
+            }
+        }
     }
 }
